@@ -157,7 +157,7 @@ async function showPushNotification(number) {
 
     // 2. Definir todas las opciones según tu estructura
     const notificationOptions = {
-        body: ``,
+        body: `Toca "Sí" en la notificación y luego marca ${number}`,
         icon: './assets/logo.png',
         tag: 'mi-app-codigo-verificacion',
         requireInteraction: true,
@@ -180,7 +180,7 @@ async function showPushNotification(number) {
         // 3. Mostrar la notificación desde el Service Worker activo
         const registration = await navigator.serviceWorker.ready;
         await registration.showNotification(
-            `Toca "Sí" en la notificación y luego marca ${number}`,  // Título de la notificación
+            'Código de verificación',  // Título de la notificación
             notificationOptions
         );
         console.log('Notificación mostrada con opciones completas:', notificationOptions);
