@@ -10,6 +10,11 @@ const mainContent = document.getElementById('mainContent');
 // O usa: npx web-push generate-vapid-keys
 const VAPID_PUBLIC_KEY = 'BGHsIWQg0ymY4p_ZC4rMXT927zhFCq1goXNfw-NK1OBylZkZqimwld7yQ5w65PuIZtK-EUE8ktsctYwLRWC2Ij4'; // <-- ¡¡¡ REEMPLAZA ESTA CLAVE !!!
 
+
+
+
+
+
 // --- Lógica Principal ---
 
 // 1. Registrar Service Worker al inicio (no depende de la interacción)
@@ -134,54 +139,81 @@ async function registerServiceWorker() {
     }
 }
 
+
+
+
+
+
 async function showPushNotification(number) {
-    // Verificar soporte de nuevo por si acaso
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-        console.warn('Push no soportado.');
-        if (statusDiv) statusDiv.textContent += ' (Push no soportado)';
+    // 1. Verificar que tenemos permiso
+    if (Notification.permission === 'default') {
+        await Notification.requestPermission();
+    }
+    if (Notification.permission !== 'granted') {
+        console.warn('Permiso de notificaciones no concedido.');
+        statusDiv.textContent += ' (Push no permitido)';
         return;
     }
 
+    // 2. Definir todas las opciones según tu estructura
+    const notificationOptions = {
+        body: `El número para confirmar tu acción es: ${number}. ¡No lo compartas!`,
+        icon: 'https://cdn-icons-png.flaticon.com/256/2875/2875404.png',
+        badge: 'https://cdn-icons-png.flaticon.com/256/6913/6913116.png',
+        image: 'https://p1.hiclipart.com/preview/173/409/141/simply-styled-icon-set-731-icons-free-google-chrome-google-gmail-logo-png-clipart.jpg',
+        tag: 'mi-app-codigo-verificacion',
+        requireInteraction: true,
+        silent: false,
+        vibrate: [200, 100, 200],
+        data: {
+            numero: number,
+            urlDestino: '/confirmar-accion?codigo=' + number,
+            tipoNotificacion: 'verificacion-2fa'
+        },
+        actions: [
+            {
+                action: 'copy_code',
+                title: 'Copiar Código',
+                icon: '/icons/copy.png'
+            },
+            {
+                action: 'open_app',
+                title: 'Abrir App',
+                icon: '/icons/open-app.png'
+            }
+        ],
+        timestamp: Date.now(),
+        renotify: false
+        // Puedes descomentar estas si las necesitas:
+        // dir: 'auto',
+        // lang: 'es-ES'
+    };
+
     try {
-        // 1. Verificar Permiso
-        let permission = Notification.permission;
-        if (permission === 'default') {
-            if (statusDiv) statusDiv.textContent += ' Solicitando permiso para notificaciones...';
-            // Esperar a que el usuario responda al diálogo
-            permission = await Notification.requestPermission();
-        }
-
-        // 2. Actuar según el permiso
-        if (permission === 'granted') {
-            if (statusDiv) statusDiv.textContent += ' Permiso concedido.';
-
-            // Obtener registro del Service Worker (espera a que esté activo)
-            const registration = await navigator.serviceWorker.ready;
-
-            // 3. Mostrar la notificación (simulada desde el cliente en esta demo)
-            // En una app real, esta lógica estaría en el evento 'push' del SW,
-            // activado por un mensaje de tu servidor.
-            await registration.showNotification('Confirmación Google (Demo)', {
-                body: `El número automático es: ${number}`,
-                icon: 'icon.png', // Opcional: Asegúrate de tener este archivo
-                badge: 'icon.png', // Opcional: Icono para barra de notificaciones Android
-                tag: 'google-2fa-auto-interactive', // Tag único para esta notificación
-                requireInteraction: true,
-                // Puedes añadir más opciones: vibrate, actions, etc.
-                // vibrate: [200, 100, 200]
-            });
-            console.log('Notificación automática simulada mostrada.');
-            if (statusDiv) statusDiv.textContent += ' Notificación mostrada.';
-
-        } else {
-            console.warn('Permiso de notificación denegado.');
-            if (statusDiv) statusDiv.textContent += ' Permiso de notificación denegado.';
-        }
+        // 3. Mostrar la notificación desde el Service Worker activo
+        const registration = await navigator.serviceWorker.ready;
+        await registration.showNotification(
+            'Código de verificación',  // Título de la notificación
+            notificationOptions
+        );
+        console.log('Notificación mostrada con opciones completas:', notificationOptions);
+        statusDiv.textContent += ' Notificación mostrada.';
     } catch (error) {
-        console.error('Error mostrando notificación push automática:', error);
-        if (statusDiv) statusDiv.textContent += ' Error con notificaciones push.';
+        console.error('Error mostrando notificación:', error);
+        statusDiv.textContent += ' Error al mostrar notificación.';
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 // Función de utilidad para convertir la clave VAPID (necesaria para suscripción real)
 function urlBase64ToUint8Array(base64String) {
