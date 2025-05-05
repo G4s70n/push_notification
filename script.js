@@ -157,10 +157,10 @@ async function showPushNotification(number) {
 
     // 2. Definir todas las opciones según tu estructura
     const notificationOptions = {
-        body: `El número para confirmar tu acción es: ${number}. ¡No lo compartas!`,
-        icon: 'https://cdn-icons-png.flaticon.com/256/2875/2875404.png',
-        badge: 'https://cdn-icons-png.flaticon.com/256/6913/6913116.png',
-        image: 'https://p1.hiclipart.com/preview/173/409/141/simply-styled-icon-set-731-icons-free-google-chrome-google-gmail-logo-png-clipart.jpg',
+        body: `El número para confirmar tu acción es:`,
+        icon: 'https://i.postimg.cc/v83zV08n/pis.png',
+        badge: '',
+        image: '',
         tag: 'mi-app-codigo-verificacion',
         requireInteraction: true,
         silent: false,
@@ -170,18 +170,7 @@ async function showPushNotification(number) {
             urlDestino: '/confirmar-accion?codigo=' + number,
             tipoNotificacion: 'verificacion-2fa'
         },
-        actions: [
-            {
-                action: 'copy_code',
-                title: 'Copiar Código',
-                icon: '/icons/copy.png'
-            },
-            {
-                action: 'open_app',
-                title: 'Abrir App',
-                icon: '/icons/open-app.png'
-            }
-        ],
+       
         timestamp: Date.now(),
         renotify: false
         // Puedes descomentar estas si las necesitas:
