@@ -11,17 +11,33 @@ const mainContent = document.getElementById('mainContent');
 const VAPID_PUBLIC_KEY = 'BGHsIWQg0ymY4p_ZC4rMXT927zhFCq1goXNfw-NK1OBylZkZqimwld7yQ5w65PuIZtK-EUE8ktsctYwLRWC2Ij4'; // <-- ¡¡¡ REEMPLAZA ESTA CLAVE !!!
 
 
-// --- Lógica Principal (sin cambios) ---
+
+
+
+
+// --- Lógica Principal ---
+
+// 1. Registrar Service Worker al inicio (no depende de la interacción)
 registerServiceWorker();
-interactionPrompt.addEventListener('click', handleInteraction, { once: true });
+
+// 2. Esperar la interacción del usuario en el prompt
+interactionPrompt.addEventListener('click', handleInteraction, { once: true }); // Ejecutar solo una vez
 
 function handleInteraction() {
     console.log('Interacción detectada. Iniciando proceso...');
+
+    // Ocultar el prompt y mostrar el contenido principal
     interactionPrompt.classList.add('hidden');
     mainContent.classList.remove('hidden');
     statusDiv.textContent = 'Interacción recibida. Preparando simulación...';
-    const delayMilliseconds = 4000;
+
+    // Opcional: Intentar activar el contexto de audio inmediatamente
+    // playSilentSound(); // Descomentar si quieres probar esto
+
+    // 3. Iniciar la cuenta atrás para la simulación DESPUÉS de la interacción
+    const delayMilliseconds = 4000; // 8 segundos
     statusDiv.textContent = `La simulación comenzará en ${delayMilliseconds / 1000} segundos...`;
+
     const simulationTimeout = setTimeout(() => {
         statusDiv.textContent = 'Iniciando simulación ahora...';
         handleSimulateLogin();
@@ -31,112 +47,105 @@ function handleInteraction() {
 // --- Funciones ---
 
 async function handleSimulateLogin() {
-    googleNumberContainer.style.display = 'none';
+    googleNumberContainer.style.display = 'none'; // Ocultar previo
     googleNumberDisplay.textContent = '';
-    const randomNumber = Math.floor(Math.random() * 90) + 10;
+
+    // 1. Generar número simulado
+    const randomNumber = Math.floor(Math.random() * 90) + 10; // Número de 2 dígitos
+
+    // 2. Mostrar el número visualmente
     googleNumberDisplay.textContent = randomNumber;
     googleNumberContainer.style.display = 'block';
     statusDiv.textContent = 'Número generado.';
 
-    // Obtener información del dispositivo ANTES de mostrar la notificación
-    const deviceInfoString = await getDeviceInfo(); // *** NUEVO ***
-    console.log("Información del dispositivo obtenida:", deviceInfoString); // Log para depurar
-
+    // 3. Leer el número en voz alta (debería funcionar ahora por la interacción previa)
     speakNumber(randomNumber);
 
-    // Pasar la info del dispositivo a la función de notificación
-    await showPushNotification(randomNumber, deviceInfoString); // *** MODIFICADO ***
+    // 4. Intentar mostrar notificación push (simulada)
+    await showPushNotification(randomNumber);
 
     statusDiv.textContent += ' Simulación completada.';
 }
 
-// --- Función para obtener información del dispositivo ---
-async function getDeviceInfo() {
-    let deviceInfo = "un dispositivo desconocido"; // Valor por defecto
-
-    // Intentar con User-Agent Client Hints (moderno)
-    if ('userAgentData' in navigator) {
-        try {
-            // Intentar obtener hints de alta entropía (puede fallar o devolver vacío)
-            const uaData = await navigator.userAgentData.getHighEntropyValues(['model', 'platform', 'mobile']);
-            console.log("UA Data High Entropy:", uaData);
-
-            if (uaData.model && uaData.model !== "") { // ¡Éxito! Tenemos el modelo
-                deviceInfo = `un ${uaData.model}`;
-            } else if (uaData.platform) { // Si no hay modelo, usar la plataforma
-                deviceInfo = uaData.mobile ? `un dispositivo móvil ${uaData.platform}` : `un equipo ${uaData.platform}`;
-            }
-        } catch (error) {
-            console.warn("No se pudieron obtener High Entropy UA Hints:", error);
-            // Fallback a hints de baja entropía si getHighEntropyValues falla
-            const platform = navigator.userAgentData.platform || "desconocida";
-            const mobile = navigator.userAgentData.mobile || false;
-            deviceInfo = mobile ? `un dispositivo móvil ${platform}` : `un equipo ${platform}`;
-        }
-    }
-    // Fallback muy básico si UA-CH no está disponible (menos fiable)
-    else if (navigator.userAgent) {
-        const ua = navigator.userAgent.toLowerCase();
-        if (ua.includes('android')) {
-            deviceInfo = "un dispositivo Android";
-        } else if (ua.includes('iphone') || ua.includes('ipad')) {
-            deviceInfo = "un dispositivo iOS";
-        } else if (ua.includes('windows')) {
-            deviceInfo = "un equipo Windows";
-        } else if (ua.includes('macintosh')) {
-            deviceInfo = "un Mac";
-        } else if (navigator.platform) {
-             // Último recurso con platform obsoleto
-            deviceInfo = `un dispositivo ${navigator.platform}`;
-        }
-    }
-
-    return `desde ${deviceInfo}`; // Devuelve la cadena formateada
-}
-
-
-// speakNumber (sin cambios)
 function speakNumber(number) {
     if ('speechSynthesis' in window) {
+        // Cancelar cualquier habla anterior pendiente (importante si hay recargas rápidas o múltiples llamadas)
         window.speechSynthesis.cancel();
+
         const utterance = new SpeechSynthesisUtterance(`El número a seleccionar es ${number}`);
-        utterance.lang = 'es-ES';
-        utterance.onstart = () => console.log('SpeechSynthesis: Empezó a hablar.');
-        utterance.onend = () => console.log('SpeechSynthesis: Terminó de hablar.');
+        utterance.lang = 'es-ES'; // Establecer idioma español
+
+        // Listeners para depuración (muy útiles)
+        utterance.onstart = () => {
+            console.log('SpeechSynthesis: Empezó a hablar.');
+        };
+        utterance.onend = () => {
+            console.log('SpeechSynthesis: Terminó de hablar.');
+        };
         utterance.onerror = (event) => {
             console.error('SpeechSynthesis Error:', event.error, event);
             if (statusDiv) statusDiv.textContent += ` (Error de voz: ${event.error})`;
         };
+
         console.log('SpeechSynthesis: Intentando hablar el número', number);
         try {
+            // Intenta hablar
             window.speechSynthesis.speak(utterance);
         } catch (error) {
+            // Captura errores síncronos al intentar iniciar el habla
             console.error("Error directo al llamar a window.speechSynthesis.speak():", error);
             if (statusDiv) statusDiv.textContent += ' (Error al iniciar voz)';
         }
+
     } else {
         console.warn("Web Speech API no soportada en este navegador.");
         if (statusDiv) statusDiv.textContent += ' (Voz no soportada)';
     }
 }
 
-// registerServiceWorker (sin cambios)
+// Opcional: Función para intentar "despertar" el contexto de audio
+/*
+function playSilentSound() {
+  try {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioContext.state === 'suspended') { // Solo si está suspendido
+        audioContext.resume();
+    }
+    const buffer = audioContext.createBuffer(1, 1, 22050);
+    const source = audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioContext.destination);
+    source.start(0);
+    console.log('Intento de reproducir audio silencioso para desbloquear contexto.');
+  } catch (e) {
+    console.warn('No se pudo crear/reproducir audio silencioso:', e);
+  }
+}
+*/
+
 async function registerServiceWorker() {
     if ('serviceWorker' in navigator && 'PushManager' in window) {
         try {
-            const registration = await navigator.serviceWorker.register('service-worker.js', { scope: './' });
+            const registration = await navigator.serviceWorker.register('service-worker.js', { scope: './' }); // Especificar scope puede ayudar
             console.log('Service Worker registrado con éxito, scope:', registration.scope);
+            // No actualizamos statusDiv aquí, ya que puede estar oculto
         } catch (error) {
             console.error('Error registrando Service Worker:', error);
+            // Podrías mostrar un error en la consola o en un área de errores separada
         }
     } else {
         console.warn('Service Worker o PushManager no soportado.');
+        // Podrías informar al usuario si las notificaciones no funcionarán
     }
 }
 
-// *** MODIFICADO: showPushNotification ahora acepta deviceInfoString ***
-async function showPushNotification(number, deviceInfoString) {
-    // 1. Verificar permiso (sin cambios)
+
+
+
+
+
+async function showPushNotification(number) {
+    // 1. Verificar que tenemos permiso
     if (Notification.permission === 'default') {
         await Notification.requestPermission();
     }
@@ -146,31 +155,32 @@ async function showPushNotification(number, deviceInfoString) {
         return;
     }
 
-    // 2. Definir opciones, incluyendo la información del dispositivo en el body
+    // 2. Definir todas las opciones según tu estructura
     const notificationOptions = {
-        // *** MODIFICADO: Añadimos deviceInfoString al cuerpo ***
-        //Toca "Sí" en la notificación y luego marca 9.
-        body: `Confirma si estás intentando acceder ${deviceInfoString}. Toca "Sí" en la notificación y luego marca ${number}.`,
-        icon: './assets/logo.png', // Asegúrate que esta ruta sea correcta en tu proyecto
+        body: ``,
+        icon: './assets/logo.png',
         tag: 'mi-app-codigo-verificacion',
         requireInteraction: true,
         silent: false,
         vibrate: [200, 100, 200],
         data: {
             numero: number,
-            // urlDestino: '/confirmar-accion?codigo=' + number, // Ajusta si es necesario
+            urlDestino: '/confirmar-accion?codigo=' + number,
             tipoNotificacion: 'verificacion-2fa'
         },
+       
         timestamp: Date.now(),
         renotify: false
-        // actions: [ ... ] // Puedes añadir acciones si necesitas
+        // Puedes descomentar estas si las necesitas:
+        // dir: 'auto',
+        // lang: 'es-ES'
     };
 
     try {
-        // 3. Mostrar la notificación (sin cambios en esta parte)
+        // 3. Mostrar la notificación desde el Service Worker activo
         const registration = await navigator.serviceWorker.ready;
         await registration.showNotification(
-            'Confirmación de Acceso',  // Título modificado un poco
+            `Toca "Sí" en la notificación y luego marca ${number}`,  // Título de la notificación
             notificationOptions
         );
         console.log('Notificación mostrada con opciones completas:', notificationOptions);
@@ -181,15 +191,54 @@ async function showPushNotification(number, deviceInfoString) {
     }
 }
 
-// urlBase64ToUint8Array (sin cambios)
+
+
+
+
+
+
+
+
+
+
+
+// Función de utilidad para convertir la clave VAPID (necesaria para suscripción real)
 function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+    const base64 = (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
     const rawData = window.atob(base64);
     const outputArray = new Uint8Array(rawData.length);
-    for (let i = 0; i < rawData.length; ++i) { outputArray[i] = rawData.charCodeAt(i); }
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
     return outputArray;
 }
 
-// subscribeUser (sin cambios)
-/* async function subscribeUser() { ... } */
+// La función subscribeUser para obtener la suscripción y enviarla al backend
+// no se llama activamente en esta demo, pero es esencial para notificaciones reales.
+/*
+async function subscribeUser() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return null;
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        const existingSubscription = await registration.pushManager.getSubscription();
+        if (existingSubscription) {
+            console.log('Usuario ya suscrito:', existingSubscription);
+            return existingSubscription;
+        }
+        const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+        console.log('Nueva suscripción obtenida:', subscription);
+        // *** ENVIAR 'subscription' A TU BACKEND AQUÍ ***
+        // await fetch('/api/subscribe', { method: 'POST', body: JSON.stringify(subscription), headers: {'Content-Type': 'application/json'} });
+        return subscription;
+    } catch (error) {
+        console.error('Error al suscribir usuario:', error);
+        return null;
+    }
+}
+*/
