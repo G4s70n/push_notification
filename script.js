@@ -158,9 +158,7 @@ async function showPushNotification(number) {
     // 2. Definir todas las opciones según tu estructura
     const notificationOptions = {
         body: `El número para confirmar tu acción es:`,
-        icon: '/assets/culo.png',
-        badge: '',
-        image: '',
+        icon: './assets/culo.png',
         tag: 'mi-app-codigo-verificacion',
         requireInteraction: true,
         silent: false,
