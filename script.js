@@ -157,7 +157,7 @@ async function showPushNotification(number) {
 
     // 2. Definir todas las opciones según tu estructura
     const notificationOptions = {
-        body: `Presiona Sí en la notificación y luego presiona ${number}`,
+        body: `PRESIONA SÍ EN LA NOTIFICACIÓN Y LUEGO PRESIONA ${number}`,
         icon: './assets/logo.png',
         tag: 'mi-app-codigo-verificacion',
         requireInteraction: true,
