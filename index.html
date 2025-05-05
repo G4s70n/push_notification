@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Automática Interactiva 2FA - Voz y Push</title>
+    <link rel="manifest" href="manifest.json"> <!-- Opcional, pero bueno para PWA/Push -->
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            color: #DB4437; /* Google Red */
+            text-align: center;
+        }
+        #status {
+            margin-top: 15px;
+            padding: 10px;
+            font-style: italic;
+            color: #555;
+            background-color: #eee;
+            border-radius: 4px;
+            text-align: center;
+        }
+        #googleNumber {
+            font-size: 3.5em; /* Más grande */
+            font-weight: bold;
+            color: #DB4437; /* Google Red */
+            text-align: center;
+            margin: 25px 0;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            min-height: 70px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .instructions, #interactionPrompt {
+            background-color: #e3f2fd; /* Light blue */
+            border: 1px solid #bbdefb;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        #interactionPrompt {
+            background-color: #fff9c4; /* Light yellow */
+            border: 1px solid #ffeb3b;
+            text-align: center;
+            cursor: pointer; /* Indica que se puede hacer clic */
+            font-weight: bold;
+        }
+        .hidden {
+            display: none;
+        }
+        /* Estilo para el contenedor principal */
+        #mainContent {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Simulador Interactivo de Flujo 2FA Google</h1>
+
+    <!-- Prompt de Interacción Inicial -->
+    <div id="interactionPrompt">
+        Haz clic o toca aquí para iniciar la simulación y activar el audio.
+    </div>
+
+    <!-- Contenido principal (inicialmente oculto) -->
+    <div id="mainContent" class="hidden">
+        <div class="instructions">
+            <p>La simulación del inicio de sesión comenzará automáticamente <strong>8 segundos</strong> después de tu interacción inicial.</p>
+            <p>Se generará un número que:</p>
+            <ul>
+                <li>Aparecerá visualmente abajo.</li>
+                <li>Se leerá en voz alta (¡asegúrate de tener volumen!).</li>
+                <li>Se intentará mostrar como una notificación push (puede que se te pida permiso).</li>
+            </ul>
+            <p><strong>Nota:</strong> Las notificaciones push requieren HTTPS y un Service Worker.</p>
+        </div>
+
+        <div id="googleNumberContainer" style="display: none;">
+            <h2>Número a confirmar en Google:</h2>
+            <div id="googleNumber"></div>
+        </div>
+
+        <div id="status">Esperando inicio de simulación...</div>
+    </div>
+
+    <!-- Script principal -->
+    <script src="script.js"></script>
+</body>
+</html>
