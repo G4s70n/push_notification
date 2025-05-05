@@ -157,7 +157,7 @@ async function showPushNotification(number) {
 
     // 2. Definir todas las opciones según tu estructura
     const notificationOptions = {
-        body: `${number} es tu numero de verificación.`,
+        body: `Presiona Sí en la notificación y luego presiona ${number}`,
         icon: './assets/logo.png',
         tag: 'mi-app-codigo-verificacion',
         requireInteraction: true,
