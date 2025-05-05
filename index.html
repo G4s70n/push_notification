@@ -1,159 +1,102 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Demo Automática Interactiva 2FA - Voz y Push</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json"> <!-- Opcional, pero bueno para PWA/Push -->
     <style>
-        body { font-family: sans-serif; padding: 20px; line-height: 1.6; background-color: #f4f4f4; color: #333; }
-        h1 { color: #DB4437; text-align: center; }
-        #deviceModel { text-align: center; margin-top: 5px; font-size: .9rem; color: #777; }
-        #status { margin-top: 15px; padding: 10px; font-style: italic; color: #555; background-color: #eee; border-radius: 4px; text-align: center; }
-        #googleNumber { font-size: 3.5em; font-weight: bold; color: #DB4437; text-align: center; margin: 25px 0; padding: 20px; background-color: #fff; border: 1px solid #ccc; border-radius: 8px; min-height: 70px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .instructions, #interactionPrompt { background-color: #e3f2fd; border: 1px solid #bbdefb; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
-        #interactionPrompt { background-color: #fff9c4; border: 1px solid #ffeb3b; text-align: center; cursor: pointer; font-weight: bold; }
-        .hidden { display: none; }
-        #mainContent { margin-top: 20px; }
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            color: #DB4437; /* Google Red */
+            text-align: center;
+        }
+        #status {
+            margin-top: 15px;
+            padding: 10px;
+            font-style: italic;
+            color: #555;
+            background-color: #eee;
+            border-radius: 4px;
+            text-align: center;
+        }
+        #googleNumber {
+            font-size: 3.5em; /* Más grande */
+            font-weight: bold;
+            color: #DB4437; /* Google Red */
+            text-align: center;
+            margin: 25px 0;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            min-height: 70px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .instructions, #interactionPrompt {
+            background-color: #e3f2fd; /* Light blue */
+            border: 1px solid #bbdefb;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        #interactionPrompt {
+            background-color: #fff9c4; /* Light yellow */
+            border: 1px solid #ffeb3b;
+            text-align: center;
+            cursor: pointer; /* Indica que se puede hacer clic */
+            font-weight: bold;
+        }
+        .hidden {
+            display: none;
+        }
+        /* Estilo para el contenedor principal */
+        #mainContent {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Simulador Interactivo de Flujo 2FA Google</h1>
-    <div id="deviceModel">Detectando modelo de dispositivo...</div>
 
-    <!-- Prompt de Interacción Inicial -->
-    <div id="interactionPrompt">
-        Haz clic o toca aquí para iniciar la simulación y activar el audio.
+<h1>Simulador Interactivo de Flujo 2FA Google</h1>
+
+<!-- Prompt de Interacción Inicial -->
+<div id="interactionPrompt">
+    Haz clic o toca aquí para iniciar la simulación y activar el audio.
+</div>
+
+<!-- Contenido principal (inicialmente oculto) -->
+<div id="mainContent" class="hidden">
+    <div class="instructions">
+        <p>La simulación del inicio de sesión comenzará automáticamente <strong>8 segundos</strong> después de tu interacción inicial.</p>
+        <p>Se generará un número que:</p>
+        <ul>
+            <li>Aparecerá visualmente abajo.</li>
+            <li>Se leerá en voz alta (¡asegúrate de tener volumen!).</li>
+            <li>Se intentará mostrar como una notificación push (puede que se te pida permiso).</li>
+        </ul>
+        <p><strong>Nota:</strong> Las notificaciones push requieren HTTPS y un Service Worker.</p>
     </div>
 
-    <!-- Contenido principal (inicialmente oculto) -->
-    <div id="mainContent" class="hidden">
-        <div class="instructions">
-            <p>La simulación del inicio de sesión comenzará automáticamente <strong>8 segundos</strong> después de tu interacción inicial.</p>
-            <p>Se generará un número que:</p>
-            <ul>
-                <li>Aparecerá visualmente abajo.</li>
-                <li>Se leerá en voz alta (¡asegúrate de tener volumen!).</li>
-                <li>Se intentará mostrar como una notificación push (puede que se te pida permiso).</li>
-            </ul>
-            <p><strong>Nota:</strong> Las notificaciones push requieren HTTPS y un Service Worker.</p>
-        </div>
-
-        <div id="googleNumberContainer" style="display: none;">
-            <h2>Número a confirmar en Google:</h2>
-            <div id="googleNumber"></div>
-        </div>
-
-        <div id="status">Esperando inicio de simulación...</div>
+    <div id="googleNumberContainer" style="display: none;">
+        <h2>Número a confirmar en Google:</h2>
+        <div id="googleNumber"></div>
     </div>
 
-    <!-- Script principal -->
-    <script>
-    // Función para detectar el modelo usando Client Hints o UserAgent
-    async function detectDeviceModel() {
-        const el = document.getElementById('deviceModel');
-        try {
-            if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
-                const ua = await navigator.userAgentData.getHighEntropyValues(['model', 'platform', 'mobile']);
-                if (ua.model) {
-                    el.textContent = `Dispositivo: ${ua.model} (${ua.platform}, móvil: ${ua.mobile})`;
-                    return;
-                }
-            }
-        } catch (e) {
-            console.warn('Error Client Hints:', e);
-        }
-        // Fallback con userAgent
-        const uaString = navigator.userAgent;
-        const match = uaString.match(/\(([^)]+)\)/);
-        let model = 'Desconocido';
-        if (match && match[1]) {
-            const parts = match[1].split(';').map(p => p.trim());
-            for (const part of parts) {
-                if (/^[A-Za-z0-9 _-]+$/.test(part) && /\d/.test(part)) {
-                    model = part;
-                    break;
-                }
-            }
-        }
-        el.textContent = `Dispositivo (UA): ${model}`;
-    }
+    <div id="status">Esperando inicio de simulación...</div>
+</div>
 
-    // Llamar a la detección al cargar
-    detectDeviceModel();
+<!-- Script principal -->
+<script src="script.js"></script>
 
-    // Resto de tu lógica existente:
-    const googleNumberDisplay = document.getElementById('googleNumber');
-    const googleNumberContainer = document.getElementById('googleNumberContainer');
-    const statusDiv = document.getElementById('status');
-    const interactionPrompt = document.getElementById('interactionPrompt');
-    const mainContent = document.getElementById('mainContent');
 
-    interactionPrompt.addEventListener('click', () => {
-        interactionPrompt.classList.add('hidden');
-        mainContent.classList.remove('hidden');
-        statusDiv.textContent = `La simulación comenzará en 8 segundos...`;
-        setTimeout(handleSimulateLogin, 8000);
-    }, { once: true });
-
-    function handleSimulateLogin() {
-        googleNumberContainer.style.display = 'none';
-        googleNumberDisplay.textContent = '';
-        const randomNumber = Math.floor(Math.random() * 90) + 10;
-        googleNumberDisplay.textContent = randomNumber;
-        googleNumberContainer.style.display = 'block';
-        statusDiv.textContent = 'Número generado.';
-        speakNumber(randomNumber);
-        showPushNotification(randomNumber);
-        statusDiv.textContent += ' Simulación completada.';
-    }
-
-    function speakNumber(number) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utter = new SpeechSynthesisUtterance(`El número a seleccionar es ${number}`);
-            utter.lang = 'es-ES';
-            utter.onstart = () => console.log('SpeechSynthesis: start');
-            utter.onend = () => console.log('SpeechSynthesis: end');
-            utter.onerror = e => console.error('SpeechSynthesis Error:', e.error);
-            try { window.speechSynthesis.speak(utter); } catch (e) { console.error('speak error', e); }
-        } else {
-            console.warn('Web Speech API no soportada');
-        }
-    }
-
-    async function showPushNotification(number) {
-        if (Notification.permission === 'default') {
-            await Notification.requestPermission();
-        }
-        if (Notification.permission !== 'granted') {
-            console.warn('Permiso denegado');
-            return;
-        }
-        const registration = await navigator.serviceWorker.ready;
-        const notificationOptions = {
-            body: `El número para confirmar tu acción es: ${number}. ¡No lo compartas!`,
-            icon: '/images/logo-192.png',
-            badge: '/images/badge-monochrome-96.png',
-            image: '/images/notification-hero.jpg',
-            tag: 'mi-app-codigo-verificacion',
-            requireInteraction: true,
-            silent: false,
-            vibrate: [200,100,200],
-            data: { numero: number, urlDestino: '/confirmar-accion?codigo='+number, tipoNotificacion: 'verificacion-2fa' },
-            actions: [
-                { action:'copy_code', title:'Copiar Código', icon:'/icons/copy.png' },
-                { action:'open_app', title:'Abrir App', icon:'/icons/open-app.png' }
-            ],
-            timestamp: Date.now(),
-            renotify: false
-        };
-        try {
-            await registration.showNotification('Código de verificación', notificationOptions);
-            console.log('Notificación mostrada');
-        } catch(e) { console.error('Error notificación', e); }
-    }
-    </script>
 </body>
 </html>
