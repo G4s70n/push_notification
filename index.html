@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demo Interactiva 2FA - Notificaciones Push</title> {/* Título actualizado */}
-    <link rel="manifest" href="manifest.json">
+    <title>Demo Automática Interactiva 2FA - Voz y Push</title>
+    <link rel="manifest" href="manifest.json"> <!-- Opcional, pero bueno para PWA/Push -->
     <style>
         body {
             font-family: sans-serif;
@@ -56,6 +57,7 @@
         .hidden {
             display: none;
         }
+        /* Estilo para el contenedor principal */
         #mainContent {
             margin-top: 20px;
         }
@@ -63,21 +65,22 @@
 </head>
 <body>
 
-<h1>Simulador Interactivo de Flujo 2FA Google con Notificaciones Push</h1> {/* Título actualizado */}
+
+<h1>Simulador Interactivo de Flujo 2FA Google</h1>
 
 <!-- Prompt de Interacción Inicial -->
 <div id="interactionPrompt">
-    Haz clic o toca aquí para iniciar la simulación. {/* Texto actualizado */}
+    Haz clic o toca aquí para iniciar la simulación y activar el audio.
 </div>
 
 <!-- Contenido principal (inicialmente oculto) -->
 <div id="mainContent" class="hidden">
     <div class="instructions">
-        <p>La simulación del inicio de sesión comenzará automáticamente <strong>4 segundos</strong> después de tu interacción inicial.</p>
+        <p>La simulación del inicio de sesión comenzará automáticamente <strong>8 segundos</strong> después de tu interacción inicial.</p>
         <p>Se generará un número que:</p>
         <ul>
             <li>Aparecerá visualmente abajo.</li>
-            {/* Se eliminó la referencia a la voz */}
+            <li>Se leerá en voz alta (¡asegúrate de tener volumen!).</li>
             <li>Se intentará mostrar como una notificación push (puede que se te pida permiso).</li>
         </ul>
         <p><strong>Nota:</strong> Las notificaciones push requieren HTTPS y un Service Worker.</p>
@@ -93,6 +96,7 @@
 
 <!-- Script principal -->
 <script src="script.js"></script>
+
 
 </body>
 </html>
